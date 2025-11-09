@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pemutar Musik Online</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; text-align: center; }
+    audio { width: 80%; margin-top: 10px; }
+    .playlist { margin-top: 20px; }
+    button { margin: 5px; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>?? Playlist Musik Online</h1>
+  <audio id="player" controls></audio>
+
+  <div class="playlist">
+    <button onclick="play('https://drive.google.com/file/d/1XzuyHQngBByeEankwmBh1B2RuXxvbaiH/view?usp=sharing')">Lagu 1</button>
+    <button onclick="play('https://drive.google.com/file/d/1DiOT0etgr1lJNoWlFno4j_4GCLJt9iRW/view?usp=sharing')">Lagu 2</button>
+    
+  </div>
+
+  <script>
+    function play(src) {
+      document.getElementById('player').src = src;
+      document.getElementById('player').play();
+    }
+  </script>
+</body>
+</html>
