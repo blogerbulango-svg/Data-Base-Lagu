@@ -1,29 +1,255 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pemutar Musik Online</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: #fff; text-align: center; }
-    audio { width: 80%; margin-top: 10px; }
-    .playlist { margin-top: 20px; }
-    button { margin: 5px; padding: 10px; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #121212, #1f1f1f);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin: 20px 0;
+      font-size: 1.8em;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .player {
+      background: #181818;
+      border-radius: 20px;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .cover {
+      width: 100%;
+      height: 300px;
+      border-radius: 15px;
+      object-fit: cover;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    .title {
+      margin: 15px 0 5px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    .artist {
+      font-size: 0.9em;
+      color: #aaa;
+      margin-bottom: 15px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin: 15px 0;
+    }
+
+    .controls button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.8em;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .controls button:hover {
+      color: #1db954;
+    }
+
+    .progress-container {
+      background: #333;
+      border-radius: 10px;
+      cursor: pointer;
+      height: 8px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .progress {
+      background: #1db954;
+      height: 8px;
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    .playlist {
+      margin-top: 25px;
+      width: 100%;
+      text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .song {
+      background: #252525;
+      margin: 8px 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .song:hover {
+      background: #333;
+    }
+
+    .active {
+      background: #1db954;
+      color: #000;
+    }
+
+    footer {
+      margin-top: 25px;
+      font-size: 0.85em;
+      color: #aaa;
+      text-align: center;
+      padding-bottom: 15px;
+    }
   </style>
 </head>
 <body>
-  <h1>?? Playlist Musik Online</h1>
-  <audio id="player" controls></audio>
+  <h1>?? Pemutar Musik Online</h1>
 
-  <div class="playlist">
-    <button onclick="play('https://drive.google.com/file/d/1XzuyHQngBByeEankwmBh1B2RuXxvbaiH/view?usp=sharing')">Lagu 1</button>
-    <button onclick="play('https://drive.google.com/file/d/1DiOT0etgr1lJNoWlFno4j_4GCLJt9iRW/view?usp=sharing')">Lagu 2</button>
+  <div class="player">
+    <img id="cover" class="cover" src="https://i.imgur.com/8Km9tLL.jpg" alt="cover" />
+    <div class="title" id="title">Lagu 1 - SoundHelix</div>
+    <div class="artist" id="artist">SoundHelix</div>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="controls">
+      <button id="prev">??</button>
+      <button id="playPause">??</button>
+      <button id="next">??</button>
+    </div>
+
+    <audio id="audio"></audio>
+
+    <div class="playlist" id="playlist">
+      <!-- Ganti link MP3 & cover -->
+      <div class="song active" 
+           data-src="https://drive.google.com/uc?export=download&id=1XzuyHQngBByeEankwmBh1B2RuXxvbaiH"
+           data-title="Penyemangat Hidupku - SoundHelix"
+           data-artist="Komposer Bulango"
+           data-cover="https://drive.google.com/file/d/1AapeTqTMubmQGAyBnF0GS-wpJdIT0HIp/view?usp=sharing">
+           ?? Lagu 1 - SoundHelix
+      </div>
     
+      </div>
+    </div>
   </div>
 
+  <footer>© 2025 Pemutar Musik Online | Dibuat dengan ?? oleh Kamu</footer>
+
   <script>
-    function play(src) {
-      document.getElementById('player').src = src;
-      document.getElementById('player').play();
+    const audio = document.getElementById("audio");
+    const playPauseBtn = document.getElementById("playPause");
+    const nextBtn = document.getElementById("next");
+    const prevBtn = document.getElementById("prev");
+    const cover = document.getElementById("cover");
+    const title = document.getElementById("title");
+    const artist = document.getElementById("artist");
+    const progress = document.getElementById("progress");
+    const progressContainer = document.getElementById("progressContainer");
+    const songs = document.querySelectorAll(".song");
+
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    function loadSong(index) {
+      const song = songs[index];
+      audio.src = song.getAttribute("data-src");
+      title.textContent = song.getAttribute("data-title");
+      artist.textContent = song.getAttribute("data-artist");
+      cover.src = song.getAttribute("data-cover");
+      songs.forEach(s => s.classList.remove("active"));
+      song.classList.add("active");
     }
+
+    function playSong() {
+      audio.play();
+      playPauseBtn.textContent = "??";
+      isPlaying = true;
+    }
+
+    function pauseSong() {
+      audio.pause();
+      playPauseBtn.textContent = "??";
+      isPlaying = false;
+    }
+
+    playPauseBtn.addEventListener("click", () => {
+      isPlaying ? pauseSong() : playSong();
+    });
+
+    nextBtn.addEventListener("click", nextSong);
+    prevBtn.addEventListener("click", prevSong);
+
+    function nextSong() {
+      currentIndex = (currentIndex + 1) % songs.length;
+      loadSong(currentIndex);
+      playSong();
+    }
+
+    function prevSong() {
+      currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+      loadSong(currentIndex);
+      playSong();
+    }
+
+    songs.forEach((song, index) => {
+      song.addEventListener("click", () => {
+        currentIndex = index;
+        loadSong(currentIndex);
+        playSong();
+      });
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      const progressPercent = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = progressPercent + "%";
+    });
+
+    progressContainer.addEventListener("click", (e) => {
+      const width = progressContainer.clientWidth;
+      const clickX = e.offsetX;
+      const duration = audio.duration;
+      audio.currentTime = (clickX / width) * duration;
+    });
+
+    audio.addEventListener("ended", nextSong);
+
+    // mulai otomatis lagu pertama
+    window.addEventListener("load", () => {
+      loadSong(0);
+      playSong();
+    });
   </script>
 </body>
 </html>
